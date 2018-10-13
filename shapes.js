@@ -21,7 +21,7 @@ function circle(x, y, r, p) {
   var ps = [];
   for(var i=0; i<=p; i++) {
     ps.push([
-      x+r*Math.cos(Math.PI*2/p*i),
+      x+r*Math.cos(Math.PI*2/p*i+d.a0),
       y+r*Math.sin(Math.PI*2/p*i)
     ])
   }

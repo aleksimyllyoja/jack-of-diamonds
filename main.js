@@ -76,13 +76,17 @@ function intersections(l, s) {
   return is;
 }
 
+function distance(x1, y1, x2, y2) {
+  return Math.sqrt((x1-x2)**2+(y1-y2)**2);
+}
+
 function cut_line(l, shape) {
   var nl = [];
   var cps = intersections(l, shape);
   cps.unshift(l[0]);
   cps.push(l[1]);
 
-  //cps = _.sortBy(cps, function(l) { return l[0] });
+  cps = _.sortBy(cps, function(cp) { return distance(l[0][0], l[0][1], cp[0], cp[1]) });
 
   for(var i=0; i<cps.length-1; i++) {
     var tp = [
@@ -90,8 +94,8 @@ function cut_line(l, shape) {
       .5*(cps[i][1]+cps[i+1][1])
     ];
 
-    mark(tp[0], tp[1]);
-    mark(cps[i][0], cps[i][1]);
+    //mark(tp[0], tp[1]);
+    //mark(cps[i][0], cps[i][1]);
 
     if(pil(tp, shape)) {
       nl.push(cps[i]); nl.push(cps[i+1]);
@@ -160,12 +164,12 @@ function draw() {
 
   //var cl = cut_line(l, c);
   var ct = circle_texture();
-  //var lt = cut_texture(line_texture(), c2);
+  var lt = cut_texture(line_texture(), c2);
   var ls = cut_texture(ct, c);
   drawm(ls);
-  //drawm(lt);
+  drawm(lt);
   draw_points(c);
-  //draw_points(c2);
+  draw_points(c2);
   /*
   draw_points(cut_path(b, c));
   draw_points(c);
@@ -178,6 +182,7 @@ var ctx = canvas.getContext("2d");
 var d = {
   padding: 86,
   radius: 21,
+  a0: 0,
 }
 
 var lt = {
@@ -198,6 +203,9 @@ var pc = gui.add(d, 'padding', 3, 100);
 pc.onChange(draw);
 
 var pc = gui.add(d, 'radius', 3, 100);
+pc.onChange(draw);
+
+var pc = gui.add(d, 'a0', -8, 8);
 pc.onChange(draw);
 
 var pc = gui.add(lt, 'slope', -50, 50);

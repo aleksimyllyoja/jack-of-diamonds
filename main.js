@@ -1,10 +1,13 @@
+var canvas = document.getElementById("c");
+var ctx = canvas.getContext("2d");
+
 function draw_points(ps) {
   ctx.beginPath();
 
-  ctx.moveTo(ps[0][0]*cs.scale, ps[0][1]*cs.scale);
+  ctx.moveTo(ps[0][0]*general.scale, ps[0][1]*general.scale);
 
   for(var i=0; i<ps.length; i++) {
-    ctx.lineTo(ps[i][0]*cs.scale, ps[i][1]*cs.scale);
+    ctx.lineTo(ps[i][0]*general.scale, ps[i][1]*general.scale);
   }
 
   ctx.stroke();
@@ -93,16 +96,10 @@ function cut_line(l, shape) {
       .5*(cps[i][0]+cps[i+1][0]),
       .5*(cps[i][1]+cps[i+1][1])
     ];
-
-    //mark(tp[0], tp[1]);
-    //mark(cps[i][0], cps[i][1]);
-
     if(pil(tp, shape)) {
       nl.push(cps[i]); nl.push(cps[i+1]);
-      //nl.push(tp);
     }
   }
-  //nl = _.uniq(nl);
   return nl;
 }
 
@@ -110,28 +107,30 @@ function cut_path(path, shape) {
   var np = [];
   for(var i=0; i<path.length-1; i++) {
     var nl = cut_line([path[i], path[i+1]], shape);
-    if(nl.length>0) np.push.apply(np, nl);
+    if(nl.length>1) np.push(nl);
   }
-  return _.uniq(np);
+  return np;
 }
 
 function cut_texture(text, shape) {
   var nt = [];
   for(var i=0; i<text.length; i++) {
     var c = cut_path(text[i], shape);
-    if(c.length>0) nt.push(c);
+    if(c.length>0) nt.push.apply(nt, c);
   }
   return nt;
 }
 
-function mark(x, y) {
+function mark(x, y, c) {
+  ctx.strokeStyle = c ? c : 'black';
   draw_points(circle(x, y, 2, 6));
+  ctx.strokeStyle = 'black';
 }
 
-function line_texture() {
+function line_texture(padding, slope) {
   var text = [];
-  for(var i=0; i<218; i=i+lt.padding) {
-    text.push(line(0, i, 300, i+lt.slope));
+  for(var i=0; i<218; i=i+padding) {
+    text.push(line(0, i, 300, i+slope));
   }
   return text;
 }
@@ -142,77 +141,138 @@ function drawm(pss) {
   }
 }
 
-function circle_texture() {
+function circle_texture(
+  padding,
+  radius,
+  p,
+  phase,
+  xphase,
+  yphase
+  ) {
   var text = [];
-  for(var y=0; y<=218+d.padding; y=y+d.padding) {
-    for(var x=0; x<=300+d.padding; x=x+d.padding) {
-      text.push(circle(x, y, d.radius, 10));
+  for(var y=0; y<=218+padding; y=y+padding) {
+    for(var x=0; x<=300+padding; x=x+padding) {
+      text.push(circle(x, y, radius, p, phase, xphase, yphase));
     }
   }
   return text;
 }
 
 function draw() {
-  canvas.width = 300*cs.scale;
-  canvas.height = 218*cs.scale;
-
+  canvas.width = W*general.scale;
+  canvas.height = H*general.scale;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  var c = circle(80, 140, 70, 100);
-  var c2 = circle(220, 70, 40, 5);
-  //draw_points(l);
-  //draw_points(c);
 
-  //var cl = cut_line(l, c);
-  var ct = circle_texture();
-  var lt = cut_texture(line_texture(), c2);
-  var ls = cut_texture(ct, c);
+  var c1 = circle(
+    80, 140,
+    c1s.radius, c1s.precision,
+    c1s.phase, c1s.xphase, c1s.yphase
+  );
+  var c2 = circle(220, 70,
+    c2s.radius, c2s.precision,
+    c2s.phase, c2s.xphase, c2s.yphase
+  );
+
+  var lt = cut_texture(line_texture(
+    lts.padding, lts.slope
+  ), c2);
+  var ls = cut_texture(
+    circle_texture(
+      cts.padding,
+      cts.radius,
+      cts.precision,
+      cts.phase,
+      cts.xphase,
+      cts.yphase,
+    ),
+    c1
+  );
+
   drawm(ls);
   drawm(lt);
-  draw_points(c);
+  draw_points(c1);
   draw_points(c2);
-  /*
-  draw_points(cut_path(b, c));
-  draw_points(c);
-  */
 }
 
-var canvas = document.getElementById("c");
-var ctx = canvas.getContext("2d");
+var W = 300;
+var H = 218;
 
-var d = {
+var gui = new dat.GUI();
+
+var general = {
+  scale: 4.4,
+  toggle_fullscreen: function(){
+    if (screenfull.enabled) {
+      screenfull.toggle();
+    }
+  }
+};
+
+var gf = gui.addFolder('General');
+gf.add(general, 'toggle_fullscreen').onChange(draw);
+gf.add(general, 'scale', 1, 5).onChange(draw);
+gf.open();
+
+var c1s = {
+  radius: 71,
+  precision: 70,
+  xphase: 0,
+  yphase: 0,
+  phase: 0,
+}
+
+var c1sf = gui.addFolder("Circle 1");
+c1sf.add(c1s, 'radius', 3, 100).onChange(draw);
+c1sf.add(c1s, 'precision', 3, 100, 1).onChange(draw);
+c1sf.add(c1s, 'phase', -7, 7).onChange(draw);
+c1sf.add(c1s, 'xphase', -7, 7).onChange(draw);
+c1sf.add(c1s, 'yphase', -7, 7).onChange(draw);
+c1sf.open();
+
+
+var c2s = {
+  radius: 40,
+  precision: 5,
+  xphase: 0,
+  yphase: 0,
+  phase: 0,
+}
+
+var c2sf = gui.addFolder("Circle 2");
+c2sf.add(c2s, 'radius', 3, 100).onChange(draw);
+c2sf.add(c2s, 'precision', 3, 100, 1).onChange(draw);
+c2sf.add(c2s, 'phase', -7, 7).onChange(draw);
+c2sf.add(c2s, 'xphase', -7, 7).onChange(draw);
+c2sf.add(c2s, 'yphase', -7, 7).onChange(draw);
+c2sf.open();
+
+var cts = {
   padding: 86,
   radius: 21,
-  a0: 0,
+  precision: 10,
+  xphase: 0,
+  yphase: 0,
+  phase: 0,
 }
 
-var lt = {
+var ctf = gui.addFolder("Circle texture");
+ctf.add(cts, 'padding', 3, 100).onChange(draw);
+ctf.add(cts, 'radius', 3, 100).onChange(draw);
+ctf.add(cts, 'precision', 3, 100, 1).onChange(draw);
+ctf.add(cts, 'phase', -7, 7).onChange(draw);
+ctf.add(cts, 'xphase', -7, 7).onChange(draw);
+ctf.add(cts, 'yphase', -7, 7).onChange(draw);
+ctf.open();
+
+
+var lts = {
   padding: 10,
   slope: 0,
 }
 
-var cs = {
-  scale: 4.4
-};
-
-var gui = new dat.GUI();
-
-var sc = gui.add(cs, 'scale', 1, 5);
-sc.onChange(draw);
-
-var pc = gui.add(d, 'padding', 3, 100);
-pc.onChange(draw);
-
-var pc = gui.add(d, 'radius', 3, 100);
-pc.onChange(draw);
-
-var pc = gui.add(d, 'a0', -8, 8);
-pc.onChange(draw);
-
-var pc = gui.add(lt, 'slope', -50, 50);
-pc.onChange(draw);
-
-var pc = gui.add(lt, 'padding', 3, 50);
-pc.onChange(draw);
-
+var ltsf = gui.addFolder("Line texture");
+ltsf.add(lts, 'padding', 0.2, 100).onChange(draw);
+ltsf.add(lts, 'slope', 0, 200).onChange(draw);
+ltsf.open();
 
 draw();

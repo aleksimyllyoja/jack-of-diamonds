@@ -1,0 +1,73 @@
+canvas {
+  border: 1px solid black;
+}
+
+#c-c {
+  position: relative;
+  display: inline-block;
+}
+
+#c-c-c {
+  position: relative;
+}
+
+#mx {
+  position: relative;
+  border-bottom: 1px solid black;
+}
+
+#mx span {
+  border-left: 1px solid black;
+  position: absolute;
+  padding: 0.5em 0 0 0.5em;
+}
+
+span.x25 {
+  left: 25%;
+}
+
+span.x50 {
+  left: 50%;
+}
+
+span.x75 {
+  left: 75%;
+}
+
+span.x100 {
+  left: 100%;
+}
+
+#my {
+  position: absolute;
+  height: 100px;
+  width: 100px;
+  border-left: 1px solid black;
+  margin-left: 6px;
+  top: 0;
+  left: 100%;
+  height: calc(100% - 6px);
+}
+
+
+#my span {
+  border-top: 1px solid black;
+  position: absolute;
+  padding: 0em 0 0 3em;
+}
+
+span.y25 {
+  top: 25%;
+}
+
+span.y50 {
+  top: 50%;
+}
+
+span.y75 {
+  top: 75%;
+}
+
+span.y100 {
+  top: 100%;
+}

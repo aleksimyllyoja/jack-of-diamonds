@@ -4,20 +4,32 @@
   <head>
     <script type="text/javascript" src="dat.gui.min.js"></script>
     <script type="text/javascript" src="underscore-min.js"></script>
-
-    <style>
-      canvas {
-        border: 1px solid black;
-      }
-    </style>
+    <script type="text/javascript" src="screenfull.min.js"></script>
+    <link href="style.css" rel="stylesheet">
   </head>
 
   <body>
-      <canvas id="c"></canvas>
+      <div id="c-c">
+        <div id="c-c-c">
+          <canvas id="c"></canvas>
+          <div id="my">
+            <span class="y25">54.5</span>
+            <span class="y50">109</span>
+            <span class="y75">174.40</span>
+            <span class="y100">218</span>
+          </div>
+        </div>
+        <div id="mx">
+          <span class="x25">75</span>
+          <span class="x50">150</span>
+          <span class="x75">240</span>
+          <span class="x100">300</span>
+        </div>
+      </div>
   </body>
 
 
-  <script src="shapes.js"></script>
+  <script src="utils.js"></script>
   <script src="main.js"></script>
 
 </html>

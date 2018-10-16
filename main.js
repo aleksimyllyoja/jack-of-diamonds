@@ -1,18 +1,6 @@
 var canvas = document.getElementById("c");
 var ctx = canvas.getContext("2d");
 
-function draw_points(ps) {
-  ctx.beginPath();
-
-  ctx.moveTo(ps[0][0]*general.scale, ps[0][1]*general.scale);
-
-  for(var i=0; i<ps.length; i++) {
-    ctx.lineTo(ps[i][0]*general.scale, ps[i][1]*general.scale);
-  }
-
-  ctx.stroke();
-}
-
 function pil(point, vs) {
     // ray-casting algorithm based on
     // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
@@ -135,10 +123,64 @@ function line_texture(padding, slope) {
   return text;
 }
 
-function drawm(pss) {
-  for(var i=0; i<pss.length; i++) {
-    draw_points(pss[i]);
+function draw_points(ps) {
+  ctx.beginPath();
+  ctx.moveTo(ps[0][0], ps[0][1]);
+  for(var i=0; i<ps.length; i++) {
+    ctx.lineTo(ps[i][0], ps[i][1]);
   }
+  ctx.stroke();
+}
+
+function scale(pss, s) {
+  return _.map(pss, function(ps) {
+    return _.map(ps, function(p) {
+      return [p[0]*s, p[1]*s]
+    })
+  });
+}
+
+function move(pss, x, y) {
+  return _.map(pss, function(ps) {
+    return _.map(ps, function(p) {
+      return [p[0]+x, p[1]+y]
+    })
+  });
+}
+
+function repeat(pss, x, y) {
+  var mxy = Math.max(x, y);
+  var minxy = Math.min(x, y);
+  var rs = 1/mxy;
+
+  var xsize = W/mxy*x;
+  var ysize = H/mxy*y;
+
+  var marginx = (W-xsize)/2;
+  var marginy = (H-ysize)/2;
+
+  var xstep = W/mxy;
+  var ystep = H/mxy;
+
+  var rpss = [];
+  _.each(_.range(x), function(i) {
+  _.each(_.range(y), function(j) {
+    rpss.push.apply(rpss,
+      move(
+        scale(pss, rs),
+        xstep*i+marginx,
+        ystep*j+marginy,
+      )
+    );
+  })});
+  return rpss;
+}
+
+function drawm(pss) {
+  var pss = repeat(pss, general.repeatx, general.repeaty);
+  var pss = scale(pss, general.scale);
+
+  _.each(pss, draw_points);
 }
 
 function circle_texture(
@@ -188,10 +230,7 @@ function draw() {
     c1
   );
 
-  drawm(ls);
-  drawm(lt);
-  draw_points(c1);
-  draw_points(c2);
+  drawm(ls.concat(lt).concat([c1]).concat([c2]));
 }
 
 var W = 300;
@@ -201,6 +240,8 @@ var gui = new dat.GUI();
 
 var general = {
   scale: 3.4,
+  repeatx: 1,
+  repeaty: 1,
   toggle_fullscreen: function(){
     if (screenfull.enabled) {
       screenfull.toggle();
@@ -211,6 +252,8 @@ var general = {
 var gf = gui.addFolder('General');
 gf.add(general, 'toggle_fullscreen').onChange(draw);
 gf.add(general, 'scale', 1, 5).onChange(draw);
+gf.add(general, 'repeatx', 1, 20, 1).onChange(draw);
+gf.add(general, 'repeaty', 1, 20, 1).onChange(draw);
 gf.open();
 
 var c1s = {
@@ -258,12 +301,11 @@ var cts = {
 var ctf = gui.addFolder("Circle texture");
 ctf.add(cts, 'padding', 3, 100).onChange(draw);
 ctf.add(cts, 'radius', 3, 100).onChange(draw);
-ctf.add(cts, 'precision', 3, 100, 1).onChange(draw);
+ctf.add(cts, 'precision', 2, 100, 1).onChange(draw);
 ctf.add(cts, 'phase', -7, 7).onChange(draw);
 ctf.add(cts, 'xphase', -7, 7).onChange(draw);
 ctf.add(cts, 'yphase', -7, 7).onChange(draw);
 ctf.open();
-
 
 var lts = {
   padding: 10,

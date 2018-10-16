@@ -2,6 +2,10 @@ canvas {
   border: 1px solid black;
 }
 
+* {
+  font-family: serif !important;
+}
+
 #c-c {
   position: relative;
   display: inline-block;
@@ -70,4 +74,21 @@ span.y75 {
 
 span.y100 {
   top: 100%;
+}
+
+
+.dg * {
+  border-color: black !important;
+  background: white !important;
+  text-shadow: none;
+  color: black !important;
+  font-size: 1.05em;
+}
+
+.dg .c .slider-fg {
+  background: black !important;
+}
+
+.dg .c .slider {
+  border: 1px solid black;
 }

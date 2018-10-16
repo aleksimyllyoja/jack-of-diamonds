@@ -200,7 +200,7 @@ var H = 218;
 var gui = new dat.GUI();
 
 var general = {
-  scale: 4.4,
+  scale: 3.4,
   toggle_fullscreen: function(){
     if (screenfull.enabled) {
       screenfull.toggle();

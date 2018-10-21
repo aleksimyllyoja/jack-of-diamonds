@@ -4,6 +4,7 @@ var gui, drawf;
 
 var FS = { };
 var Files = { };
+var PATH = [];
 
 function register(name, f) {
   FS[name] = f;
@@ -29,17 +30,19 @@ function bezier(ps, p) {
   return bps
 }
 
-function circle(x, y, r, p, phase, xphase, yphase, rx, ry) {
+function circle(x, y, r, p, phase, xphase, yphase, rx, ry, a1) {
+  var phase = phase ? phase : 0;
   var xphase = xphase ? xphase : 0;
   var yphase = yphase ? yphase : 0;
   var rx = rx ? rx : 0;
 	var ry = ry ? ry : 0;
+	var a1 = a1 ? a1 : Math.PI*2;
 
   var ps = [];
   for(var i=0; i<=p; i++) {
     ps.push([
-      x+(r+rx)*Math.cos(Math.PI*2/p*i+xphase+phase),
-      y+(r+ry)*Math.sin(Math.PI*2/p*i+yphase+phase)
+      x+(r+rx)*Math.cos(a1/p*i+xphase+phase),
+      y+(r+ry)*Math.sin(a1/p*i+yphase+phase)
     ])
   }
 
@@ -144,7 +147,13 @@ function cut_path(path, shape) {
   var np = [];
   for(var i=0; i<path.length-1; i++) {
     var nl = cut_line([path[i], path[i+1]], shape);
-    if(nl.length>1) np.push(nl);
+    if(nl.length>1) {
+      if(np.length>0 && _.last(_.last(np)) == nl[0]) {
+        _.last(np).push.apply(_.last(np), nl);
+      } else {
+        np.push(nl);
+      }
+    }
   }
   return np;
 }
@@ -153,7 +162,9 @@ function cut_texture(text, shape) {
   var nt = [];
   for(var i=0; i<text.length; i++) {
     var c = cut_path(text[i], shape);
-    if(c.length>0) nt.push.apply(nt, c);
+    if(c.length>0) {
+      nt.push.apply(nt, c);
+    }
   }
   return nt;
 }
@@ -212,22 +223,24 @@ function _repeat(f, x, y) {
   var ystep = H/mxy;
 
   var rpss = [];
+  var ind=0
   _.each(_.range(x), function(i) {
   _.each(_.range(y), function(j) {
-    rpss.push.apply(rpss, f(rs, xstep*i+marginx, ystep*j+marginy))
+    ind++;
+    rpss.push.apply(rpss, f(rs, ind, x*y, xstep*i+marginx, ystep*j+marginy))
   })});
   return rpss;
 }
 
 function repeat(pss, x, y) {
-	return _repeat(function(s, _x, _y) {
+	return _repeat(function(s, ind, max, _x, _y) {
 		return move(scale(pss, s), _x, _y)
 	}, x, y);
 }
 
 function frepeat(x, y) {
-	return _repeat(function(s, _x, _y) {
-		return move(scale(drawf(), s), _x, _y)
+	return _repeat(function(s, ind, max, _x, _y) {
+		return move(scale(drawf(ind, max), s), _x, _y)
 	}, x, y);
 }
 
@@ -256,5 +269,8 @@ function draw() {
 
 	var pss = frepeat(general.frepeatx, general.frepeaty);
 	pss = repeat(pss, general.repeatx, general.repeaty);
+	PATH = pss;
+  console.log(PATH);
+
   _.each(scale(pss, general.scale), draw_points);
 }

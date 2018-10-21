@@ -87,7 +87,7 @@ function example1() {
       c1
     );
 
-    return ls.concat(lt).concat([c1, c2]);
+    return lt.concat(ls).concat([c1, c2]);
   }
 }
 register("Example1", example1);

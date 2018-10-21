@@ -270,7 +270,5 @@ function draw() {
 	var pss = frepeat(general.frepeatx, general.frepeaty);
 	pss = repeat(pss, general.repeatx, general.repeaty);
 	PATH = pss;
-  console.log(PATH);
-
   _.each(scale(pss, general.scale), draw_points);
 }

@@ -154,6 +154,9 @@ function faces() {
     tw2: 0.1,
     tw1: 1,
     p: 20,
+    bl2b: 20,
+    topw: 1.1,
+    top: 1,
   };
 
   var hf = gui.addFolder("Hair")
@@ -165,6 +168,9 @@ function faces() {
   hf.add(hairc, 'tw2', 0, 1).onChange(draw);
   hf.add(hairc, 'tw1', 0.2, 2).onChange(draw);
   hf.add(hairc, 'p', 0, 30, 1).onChange(draw);
+  hf.add(hairc, 'bl2b', -100, 100, 1).onChange(draw);
+  hf.add(hairc, 'topw', 0, 1).onChange(draw);
+  hf.add(hairc, 'top', 0, 1, 1).onChange(draw);
   hf.open();
 
   function hair() {
@@ -186,12 +192,26 @@ function faces() {
       [W/2 + fs.r*1.2,  hairc.y3]
     ], hairc.p);
 
+    var bendline2 = bezier([
+      [W/2 - fs.r*hairc.topw, hairc.y2+hairc.bl2b],
+      [W/2,  hairc.y2+hairc.bl2b],
+      [W/2 + fs.r*hairc.topw,  hairc.y2+hairc.bl2b]
+    ], hairc.p);
+
     var hs = [];
     _.each(hairline, function(p, i) {
       hs.push(bezier([
         p, bendline[i], hairline2[i]
       ], 10))
     });
+
+    if(hairc.top) {
+      _.each(bendline2, function(p, i) {
+        hs.push(bezier([
+          [W/2, hairc.y2], p, [W/2, 5]
+        ], 10))
+      });
+    }
 
     //return [hairline2]
     return hs;
@@ -247,7 +267,10 @@ function faces() {
       hairc.y3b = r(10, hairc.y2);
       hairc.y2b = r(0, 10);
       hairc.tw2 = r(0.1, 0.64);
+      hairc.bl2b = r(-13, 13);
       hairc.p = parseInt(r(4, 20));
+      hairc.topw = r(0.3, 1.2);
+      hairc.top = Math.random() > 0.5 ? 0 : 1;
     }
 
     var n = nose(W/2, ns.y, ns.h, ns.uw, ns.lw, ns.lb);

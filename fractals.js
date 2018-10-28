@@ -1,4 +1,4 @@
-function ca() {
+function fractals() {
   S = {
     iterations: 1,
     amplitude: 0.3,
@@ -72,4 +72,4 @@ function ca() {
     return _draw(j, max)
   }
 }
-register("ca", ca);
+register("Fractals", fractals);

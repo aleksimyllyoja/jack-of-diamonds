@@ -50,8 +50,8 @@ function ca() {
     return l1;
   }
 
-  function _draw() {
-    var ps = circle(W/2, H/2, S.radius, S.sp, S.phase+S.cp, S.phasex, S.phasey);
+  function _draw(j, max) {
+    var ps = circle(W/2, H/2, S.radius, S.sp, S.phase+S.cp, S.phasex+j, S.phasey);
 
     for(var i=0;i<S.iterations; i++) {
       ps = iter(i);
@@ -69,7 +69,7 @@ function ca() {
   }
 
   return function(j, max) {
-    return _draw()
+    return _draw(j, max)
   }
 }
 register("ca", ca);

@@ -171,7 +171,7 @@ function cut_texture(text, shape) {
 
 function mark(x, y, c) {
   ctx.strokeStyle = c ? c : 'black';
-  draw_points(circle(x, y, 2, 6));
+  draw_points(circle(x*general.scale, y*general.scale, 2, 6));
   ctx.strokeStyle = 'black';
 }
 

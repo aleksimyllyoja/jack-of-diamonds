@@ -35,6 +35,7 @@ function load_graphics(name) {
   gf.add(general, 'download_json');
   gf.add(general, 'scale', 1, 8).onChange(draw);
 
+
   var rf = gui.addFolder('Repeater');
 
   rf.add(general, 'repeatx', 1, 30, 1).onChange(draw);
@@ -45,7 +46,7 @@ function load_graphics(name) {
 
   //rf.open();
 
-  //gf.open();
+  gf.open();
 
   drawf = FS[name]();
 

@@ -43,9 +43,9 @@ function load_graphics(name) {
   rf.add(general, 'frepeatx', 1, 30, 1).onChange(draw);
   rf.add(general, 'frepeaty', 1, 30, 1).onChange(draw);
 
-  rf.open();
+  //rf.open();
 
-  gf.open();
+  //gf.open();
 
   drawf = FS[name]();
 

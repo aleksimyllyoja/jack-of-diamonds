@@ -67,12 +67,12 @@ function cs(x, y, r, rx, ry, cp) {
 function faces() {
 
   g = {
-    randomize: 1,
+    randomize: 0,
     construct: 0,
   }
 
   gui.add(g, 'randomize', 0, 1, 1);
-  gui.add(g, 'construct', 0, 1, 1);
+  //gui.add(g, 'construct', 0, 1, 1);
 
 
   ms = {
@@ -130,18 +130,24 @@ function faces() {
 
   fs = {
     y: H/2,
-    r: H/2,
-    rx: 0,
-    ry: 0,
-    cp: 8,
+    r: H/2.4,
+    l: H/2,
+    ca0: 1,
+    ca1: 1,
+    ca2: 1,
+    ca3: 1,
+    ca4: 1,
   }
 
   var ff = gui.addFolder("Face");
   ff.add(fs, 'y', 0, H).onChange(draw);
   ff.add(fs, 'r', 0, H).onChange(draw);
-  ff.add(fs, 'rx', -20, 20).onChange(draw);
-  ff.add(fs, 'ry', -20, 20).onChange(draw);
-  ff.add(fs, 'cp', -20, 20, 1).onChange(draw);
+  ff.add(fs, 'l', 0, H).onChange(draw);
+  ff.add(fs, 'ca0', 1, 20, 1).onChange(draw);
+  ff.add(fs, 'ca1', 1, 20, 1).onChange(draw);
+  ff.add(fs, 'ca2', 1, 20, 1).onChange(draw);
+  ff.add(fs, 'ca3', 1, 20, 1).onChange(draw);
+  ff.add(fs, 'ca4', 1, 20, 1).onChange(draw);
   ff.open();
 
   hairc = {
@@ -156,7 +162,7 @@ function faces() {
     p: 20,
     bl2b: 20,
     topw: 1.1,
-    top: 1,
+    top: 0,
   };
 
   var hf = gui.addFolder("Hair")
@@ -165,13 +171,19 @@ function faces() {
   hf.add(hairc, 'y2', 0, H).onChange(draw);
   hf.add(hairc, 'y2b', -10, 30).onChange(draw);
   hf.add(hairc, 'y3', 0, H).onChange(draw);
-  hf.add(hairc, 'tw2', 0, 1).onChange(draw);
+  hf.add(hairc, 'tw2', 0, 3).onChange(draw);
   hf.add(hairc, 'tw1', 0.2, 2).onChange(draw);
   hf.add(hairc, 'p', 0, 30, 1).onChange(draw);
-  hf.add(hairc, 'bl2b', -100, 100, 1).onChange(draw);
-  hf.add(hairc, 'topw', 0, 1).onChange(draw);
-  hf.add(hairc, 'top', 0, 1, 1).onChange(draw);
+
+  var tkf = hf.addFolder("Top knot")
+
+  tkf.add(hairc, 'topw', 0, 1).onChange(draw);
+  tkf.add(hairc, 'top', 0, 1, 1).onChange(draw);
+  tkf.add(hairc, 'bl2b', -100, 100, 1).onChange(draw);
+
+
   hf.open();
+
 
   function hair() {
     var hairline = bezier([
@@ -254,7 +266,6 @@ function faces() {
       fs.r = r(70, 80);
       fs.cp = parseInt(r(4, 60));
       fs.ry = r(20, 40);
-      fs.rx = r(0, 2);
 
       ms.r = r(-15, 15);
       ms.w = r(20, 70);
@@ -276,13 +287,26 @@ function faces() {
     var n = nose(W/2, ns.y, ns.h, ns.uw, ns.lw, ns.lb);
     var m = mouth(ms.x, ms.y, ms.w, ms.r);
     var es = eyes(ec.y, ec.l, ec.r);
+    /*
     var c = bezier(circle(
-      W/2, fs.y, fs.r,
+      W/2-fs.r, fs.y, fs.r,
       fs.cp, 0, 0,
       0, fs.rx, fs.ry,
       Math.PI
-    ), 100);
-    var h = hair()
+    ), 10);
+    */
+
+    var ca0 = Array(fs.ca0).fill([W/2-fs.r, fs.y])
+    var ca1 = Array(fs.ca1).fill([W/2-fs.r, fs.y+fs.r])
+    var ca2 = Array(fs.ca2).fill([W/2, fs.y+fs.l])
+    var ca3 = Array(fs.ca3).fill([W/2+fs.r, fs.y+fs.r])
+    var ca4 = Array(fs.ca4).fill([W/2+fs.r, fs.y])
+
+    var c = bezier(
+      ca0.concat(ca1, ca2, ca3, ca4)
+    , 200)
+
+    var h = hair();
 
     return [m, c]
       .concat(n)
